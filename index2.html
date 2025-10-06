@@ -1,0 +1,258 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chahat Bansal's PhD research portfolio in remote sensing and machine learning for agricultural sustainability at IIT-Delhi.">
+    <meta name="keywords" content="remote sensing, machine learning, agritech, Google Earth Engine, IIT-Delhi, crop mapping, LULC">
+    <title>Chahat Bansal - PhD Research Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="font-merriweather bg-gray-100 text-gray-800">
+    <!-- Navigation -->
+    <nav class="sticky top-0 bg-white shadow-md z-10">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-blue-800">Chahat Bansal</div>
+            <div class="space-x-4">
+                <a href="#about" class="text-blue-800 hover:text-blue-600">About</a>
+                <a href="#research" class="text-blue-800 hover:text-blue-600">Research</a>
+                <a href="#publications" class="text-blue-800 hover:text-blue-600">Publications</a>
+                <a href="#education" class="text-blue-800 hover:text-blue-600">Education</a>
+                <a href="#skills" class="text-blue-800 hover:text-blue-600">Skills</a>
+                <a href="#contact" class="text-blue-800 hover:text-blue-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="about" class="container mx-auto px-4 py-12 text-center">
+        <h1 class="text-4xl font-bold text-blue-800 mb-4">Chahat Bansal</h1>
+        <p class="text-lg max-w-2xl mx-auto">
+            PhD Candidate at IIT-Delhi specializing in remote sensing and machine learning for agricultural sustainability. I develop scalable geospatial tools using Google Earth Engine to support India's agritech and policy-making.
+        </p>
+        <div class="mt-4 flex justify-center space-x-4">
+            <a href="mailto:chahat.del@gmail.com" class="text-blue-800 hover:text-blue-600"><i class="fas fa-envelope mr-2"></i>Email</a>
+            <a href="https://www.linkedin.com/in/chahat-bansal-dec23/" class="text-blue-800 hover:text-blue-600"><i class="fab fa-linkedin mr-2"></i>LinkedIn</a>
+        </div>
+    </section>
+
+    <!-- Research Projects
+    <section id="research" class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Research Projects</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Crop Type Mapping for India</h3>
+                <p class="text-sm text-gray-600 italic">June 2025 - Present</p>
+                <p class="mt-2">Developing scalable ML classifiers to identify crop groups across India, enhancing agricultural planning with Google Earth Engine and Sentinel-2 data.</p>
+                <a href="https://github.com/ICTD-IITD/Crop_Type_Classification" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fab fa-github mr-2"></i>View on GitHub</a>
+                <img src="assets/images/crop_buffer.png" alt="Crop Type Mapping Visualization" class="mt-4 w-full aspect-square object-cover rounded">
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Intra-annual LULC Mapping for India</h3>
+                <p class="text-sm text-gray-600 italic">2022 - 2025</p>
+                <p class="mt-2">Built a GEE-based framework for LULC mapping, integrating SAR/Optical data and powering decision-support tools for 100+ villages. Supports 25+ partner organizations and 50+ village development plans.</p>
+                <a href="https://github.com/ICTD-IITD/IndiaSAT_LULC_Deliverables" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fab fa-github mr-2"></i>View on GitHub</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="https://ee-corestackdev.projects.earthengine.app/view/core-stack-gee-app" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fas fa-globe mr-2"></i>CoRE Stack App</a>
+                <img src="assets/images/lulc_example.png" alt="LULC Mapping Visualization" class="mt-4 w-full aspect-square object-cover rounded">
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Research Projects -->
+    <section id="research" class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Ongoing Research Projects</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Crop Type Mapping for India</h3>
+                <p class="text-sm text-gray-600 italic">June 2025 - Present</p>
+                <p class="mt-2">Developing scalable ML classifiers to identify crop groups across India, enhancing agricultural planning with Google Earth Engine and Sentinel-2 data.</p>
+                <a href="https://github.com/ICTD-IITD/Crop_Type_Classification" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fab fa-github mr-2"></i>View on GitHub</a>
+                <img src="assets/images/crop_buffer.png" alt="Crop Type Mapping Visualization" class="mt-4 w-full h-48 object-cover rounded">
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Intra-annual LULC Mapping for India</h3>
+                <p class="text-sm text-gray-600 italic">2022 - 2025</p>
+                <p class="mt-2">Built a GEE-based framework for LULC mapping, integrating SAR/Optical data and powering decision-support tools for 100+ villages. Supports 25+ partner organizations and 50+ village development plans.</p>
+                <a href="https://github.com/ICTD-IITD/IndiaSAT_LULC_Deliverables" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fab fa-github mr-2"></i>View on GitHub</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="https://ee-corestackdev.projects.earthengine.app/view/core-stack-gee-app" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fas fa-globe mr-2"></i>CoRE Stack App</a>
+                <img src="assets/images/lulc_example.png" alt="LULC Mapping Visualization" class="mt-4 w-full h-48 object-cover rounded">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Research Publications -->
+    <section id="research" class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Publications</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Initial Observations from Field Testing of a Digital Participatory Tool to Support Water Security in Rural India</h3>
+                <p class="text-sm text-gray-600">Shivani A Mehta, Chahat Bansal, Aaditeshwar Seth, et al. <i>ICTD 2024</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/abs/10.1145/3700794.3700816" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>]</p>
+                <p class="mt-2">Integrated intra-annual LULC datasets into the Commons Connect tool for MGNREGA water security planning.</p>
+                <!-- <a href="https://github.com/ICTD-IITD/Crop_Type_Classification" class="text-blue-800 hover:text-blue-600 mt-2 inline-block"><i class="fab fa-github mr-2"></i>View on GitHub</a> -->
+                <img src="assets/images/impact_example.png" alt="Crop Type Mapping Visualization" class="mt-4 w-100 h-100 object-cover rounded">
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">IndiaSat: A Pixel-Level Dataset for Land-Cover Classification</h3>
+                <p class="text-sm text-gray-600">Chahat Bansal, Aaditeshwar Seth, et al. <i>ACM SIGCAS 2021</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/abs/10.1145/3460112.3471953" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>] [<a href="https://github.com/ICTD-IITD/IndiaSAT" class="text-blue-800 font-semibold hover:text-blue-600">GitHub</a>]</p>
+                <p class="mt-2">Authored IndiaSat, a 180,000+ pixel dataset for land cover classification, validated with GEE models.</p>
+                <img src="assets/images/indiasat_example.png" alt="LULC Mapping Visualization" class="mt-4 w-100 h-100 object-cover rounded">
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Characterizing the Evolution of Indian Cities Using Satellite Imagery and Open Street Maps <span class="text-purple-600">[Honourable Mention]</span></h3>
+                <p class="text-sm text-gray-600">Chahat Bansal, Aaditeshwar Seth, et al. <i>ACM SIGCAS 2020</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/10.1145/3378393.3402258" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>] [<a href="https://github.com/ICTD-IITD/Characterization_Of_Urbanization_India" class="text-blue-800 font-semibold hover:text-blue-600">GitHub</a>]</p>
+                <p class="mt-2">Developed a methodology to analyze urban change in seven Indian cities using satellite imagery and OSM.</p>
+                <img src="assets/images/urbanization_example.png" alt="LULC Mapping Visualization" class="mt-4 w-100 h-100 object-cover rounded">
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-blue-800">Temporal Prediction of Socio-Economic Indicators Using Satellite Imagery</h3>
+                <p class="text-sm text-gray-600">Chahat Bansal, Aaditeshwar Seth, et al. <i>ACM IKDD CoDS 2020</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/abs/10.1145/3371158.3371167" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>] [<a href="https://github.com/ICTD-IITD/District_Temporal_Classification" class="text-blue-800 font-semibold hover:text-blue-600">GitHub</a>]</p>
+                <p class="mt-2">Enhanced temporal transferability of ML models for socio-economic indicators using census data.</p>
+                <img src="assets/images/temporal_example.png" alt="LULC Mapping Visualization" class="mt-4 w-100 h-100 object-cover rounded">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Publications -->
+    <section id="publications" class="container mx-auto px-4 py-12 bg-gray-50">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Publications</h2>
+        <div class="space-y-4">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">Initial Observations from Field Testing of a Digital Participatory Tool to Support Water Security in Rural India</h3>
+                <p class="text-sm text-gray-600">Shivani A Mehta, Chahat Bansal, Aaditeshwar Seth, et al. <i>ICTD 2024</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/abs/10.1145/3700794.3700816" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>]</p>
+                <p class="mt-2">Integrated intra-annual LULC datasets into the Commons Connect tool for MGNREGA water security planning.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">IndiaSat: A Pixel-Level Dataset for Land-Cover Classification</h3>
+                <p class="text-sm text-gray-600">Chahat Bansal, Aaditeshwar Seth, et al. <i>ACM SIGCAS 2021</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/abs/10.1145/3460112.3471953" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>] [<a href="https://github.com/ICTD-IITD/IndiaSAT" class="text-blue-800 font-semibold hover:text-blue-600">GitHub</a>]</p>
+                <p class="mt-2">Authored IndiaSat, a 180,000+ pixel dataset for land cover classification, validated with GEE models.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">Characterizing the Evolution of Indian Cities Using Satellite Imagery and Open Street Maps <span class="text-purple-600">[Honourable Mention]</span></h3>
+                <p class="text-sm text-gray-600">Chahat Bansal, Aaditeshwar Seth, et al. <i>ACM SIGCAS 2020</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/10.1145/3378393.3402258" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>] [<a href="https://github.com/ICTD-IITD/Characterization_Of_Urbanization_India" class="text-blue-800 font-semibold hover:text-blue-600">GitHub</a>]</p>
+                <p class="mt-2">Developed a methodology to analyze urban change in seven Indian cities using satellite imagery and OSM.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">Temporal Prediction of Socio-Economic Indicators Using Satellite Imagery</h3>
+                <p class="text-sm text-gray-600">Chahat Bansal, Aaditeshwar Seth, et al. <i>ACM IKDD CoDS 2020</i> &nbsp;&nbsp; [<a href="https://dl.acm.org/doi/abs/10.1145/3371158.3371167" class="text-blue-800 font-semibold hover:text-blue-600">Link</a>] [<a href="https://github.com/ICTD-IITD/District_Temporal_Classification" class="text-blue-800 font-semibold hover:text-blue-600">GitHub</a>]</p>
+                <p class="mt-2">Enhanced temporal transferability of ML models for socio-economic indicators using census data.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Education & Experience -->
+    <section id="education" class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Education & Experience</h2>
+        <div class="space-y-4">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">PhD, Indian Institute of Technology, Delhi</h3>
+                <p class="text-sm text-gray-600 italic">2018 - Present</p>
+                <p class="mt-2">Advised by Prof. Aaditeshwar Seth ; CGPA: 9/10 ; UGC NET Junior Research Fellowship.</p>
+                <p class="mt-1">Teaching Assistant (2018-2022) for Introduction to Computer Science, Computer Networks, Design Practices, & Advance Computer Networks.</p>
+                <a href="https://home.iitd.ac.in/" class="text-blue-800 hover:text-blue-600"><i class="fas fa-globe mr-2"></i>IIT-Delhi</a>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">Trainee Technology, Nagarro Softwares Pvt. Ltd.</h3>
+                <p class="text-sm text-gray-600 italic">Jan 2018 - Jun 2018, Gurugram</p>
+                <p class="mt-2">Internship in full-stack web development.</p>
+                <a href="https://www.nagarro.com/en/" class="text-blue-800 hover:text-blue-600"><i class="fas fa-globe mr-2"></i>Nagarro</a>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">MCA, Bharati Vidyapeeth, GGSIPU</h3>
+                <p class="text-sm text-gray-600 italic">2015 - 2018, New Delhi</p>
+                <p class="mt-2">CGPA: 90.7%.</p>
+                <a href="https://bvicam.in/" class="text-blue-800 hover:text-blue-600"><i class="fas fa-globe mr-2"></i>BVICAM</a>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">B.Sc. (Hons) Computer Science, Keshav Mahavidyalaya, Delhi University</h3>
+                <p class="text-sm text-gray-600 italic">2012 - 2015, New Delhi</p>
+                <p class="mt-2">CGPA: 87.49%. Co-founded Maniera Fine Arts Society, received Gem of Keshav Award.</p>
+                <a href="https://keshav.du.ac.in/" class="text-blue-800 hover:text-blue-600"><i class="fas fa-globe mr-2"></i>Keshav Mahavidyalaya</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="container mx-auto px-4 py-12 bg-gray-50">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Skills</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">Programming</h3>
+                <p class="mt-2">Python, JavaScript</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">GIS Tools</h3>
+                <p class="mt-2">Google Earth Engine, Google Earth Pro, QGIS</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold">Transferable Skills</h3>
+                <p class="mt-2">Research Design, Data Analysis, Project Management, Technical Writing</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">Contact</h2>
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <p>Email: <a href="mailto:chahat.del@gmail.com" class="text-blue-800 hover:text-blue-600">chahat.del@gmail.com</a></p>
+            <p>Phone: +91 9899609717</p>
+            <p>LinkedIn: <a href="https://www.linkedin.com/in/chahat-bansal-dec23/" class="text-blue-800 hover:text-blue-600">linkedin.com/in/chahat-bansal-dec23</a></p>
+            <p class="mt-4">Reference: Prof. Aaditeshwar Seth, IIT-Delhi (<a href="mailto:aseth@cse.iitd.ac.in" class="text-blue-800 hover:text-blue-600">aseth@cse.iitd.ac.in</a>)</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-4">
+        <p>&copy; 2025 Chahat Bansal. All rights reserved.</p>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

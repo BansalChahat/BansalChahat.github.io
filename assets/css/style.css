@@ -1,0 +1,43 @@
+.publication-image {
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 10;
+    max-width: 400px;
+    max-height: 400px;
+}
+
+.presentation-image {
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 10;
+    max-width: 512px;
+    max-height: 384px;
+}
+
+.swiper-slide {
+    min-height: 200px; /* Ensures uniform slide height */
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+    color: #1e40af; /* Tailwind's blue-800 */
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+    color: #2563eb; /* Tailwind's blue-600 */
+}
+
+.swiper-pagination-bullet {
+    background: #1e40af; /* Tailwind's blue-800 */
+}
+
+.swiper-pagination-bullet-active {
+    background: #2563eb; /* Tailwind's blue-600 */
+}
+
+.swiper-counter {
+    font-family: 'Merriweather', serif;
+    font-size: 1rem;
+    color: #1e40af; /* Tailwind's blue-800 */
+}
